@@ -61,16 +61,16 @@ export default defineComponent({
         const data=reactive(new LoginData());
         const rules = {
                 username: [
-                    { required: true, message: '请输入账号', trigger: 'blur' },
-                    { min: 3, max: 10, message: '账号长度为 3 to 10', trigger: 'blur' },
+                    { required: true, message: '请输入账号', trigger:['change' ,'blur'],},
+                    {pattern: /^[a-zA-Z0-9_-]{3,16}$/, message: '账号格式错误', trigger: ['change' ,'blur']}
                 ],
                 password: [
-                    { required: true, message: '请输入密码', trigger: 'blur' },
-                    { min: 3, max: 10, message: '密码长度为 3 to 10', trigger: 'blur' },
+                    { required: true, message: '请输入密码', trigger:['change' ,'blur'], },
+                    { min: 3, message: '密码长度至少为 ', trigger:['change' ,'blur'], },
                 ],
                 captcha:[
-                    { required: true, message: '请输入验证码', trigger: 'blur' },
-                    { min: 4, max: 4, message: '验证码错误', trigger: 'blur' },
+                    { required: true, message: '请输入验证码', trigger:['change' ,'blur'], },
+                    { min: 4, max: 4, message: '验证码格式错误', trigger:['change' ,'blur'], },
 
                 ]
         };
