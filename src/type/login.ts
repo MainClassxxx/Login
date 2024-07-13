@@ -2,12 +2,15 @@
 export interface LoginFromInt{
     uname:string
     password:string
+    captcha:string
+
 }
 //定义类,导出
 export class LoginData {
     //实例化
     ruleForm:LoginFromInt={
         uname:"",
-        password:""
+        password:"",
+        captcha:""
     }
 }
