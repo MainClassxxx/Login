@@ -11,9 +11,7 @@
             </el-form-item>
             <el-form-item label=" 验证码: " prop="captcha" >
                 <el-input v-model="form.captcha1" placeholder="请输入验证码" style="width: 70%;"/>
-                <el-button type="primary" style="width: 30%;">
-                    获取验证码
-                </el-button>
+                <el-button type="primary" style="width: 30%;" @click="btnTime" >{{ btnText }}</el-button>
             </el-form-item>
             <el-form-item label="  密码：" prop="password">
                 <el-input v-model="form.password" type="password" placeholder="请输入密码"/>
@@ -42,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from "vue";
+import { defineComponent, ref, onMounted, computed } from "vue";
 import { cAF } from 'element-plus/es/utils';
 import { reactive } from 'vue';
 import { register } from "../utils/api";
@@ -239,7 +237,7 @@ export default defineComponent({
 
             //已修改
             if (!registerForm.value) {
-                console.error("registerFrom.value 未初始化");
+                console.error("registerForm.value 未初始化");
                 return;
             }
             const isValid = await (registerForm.value as { validate: () => Promise<boolean> }).validate();
@@ -267,8 +265,55 @@ export default defineComponent({
             }
 
         }
+
+        //倒计时时间
+        const totalTime = 60;
+        //ref响应式引用,创建倒计时状态
+        const countingDown = ref(false);
+
+        // 倒计时剩余时间
+        const remainingTime =  reactive({
+            seconds: totalTime,
+        })
+
+        //计时器变量
+        let timer: number | null = null;
+
+        //倒计时
+        const startCountingDown = () => {
+            if (!countingDown.value) {
+                countingDown.value = true;
+                remainingTime.seconds = totalTime;
+            }
+            timer = setInterval(() => {
+                if (remainingTime.seconds > 0) {
+                    remainingTime.seconds--;
+                } else {
+                    stopCountingDown();
+                }
+            }, 1000);
+        }
+
+        //停止倒计时
+        const stopCountingDown = () => {
+            if(timer){
+                clearInterval(timer);
+                timer = null;
+                countingDown.value = false;
+            }
+        }
+        //按钮文字切换
+        const btnText = computed(() => (countingDown.value ? remainingTime.seconds : "获取验证码"))
+
+        const btnTime = () => {
+            startCountingDown()
+        }
+
+
         // 暴露方法
         expose({ validate });
+        
+
 
         return {
             CharacterVerification,
@@ -280,6 +325,9 @@ export default defineComponent({
             handleRegister,
             returnToLogin,
             isCaptcha,
+            btnTime,
+            btnText
+            
         };
     },
 });
