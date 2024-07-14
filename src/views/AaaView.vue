@@ -1,38 +1,33 @@
 <template>
     <div class="login-box">
-        <el-form ref="ruleFormRef" style="max-width: 600px" :model="form" status-icon :rules="rules"
-            label-width="80px" class="demo-ruleForm">
+        <el-form ref="ruleFormRef" style="max-width: 600px" :model="form" status-icon :rules="rules" label-width="80px"
+            class="demo-ruleForm">
             <h2>注册</h2>
-            <el-form-item label="  账号：" prop="uname" >
-                <el-input v-model="form.uname" placeholder="请输入账号"/>
+            <el-form-item label="  账号：" prop="uname">
+                <el-input v-model="form.uname" placeholder="请输入账号" />
             </el-form-item>
-            <el-form-item label="  手机号：" prop="mobile" >
-                <el-input v-model="form.mobile" placeholder="请输入手机号"/>
+            <el-form-item label="  手机号：" prop="mobile">
+                <el-input v-model="form.mobile" placeholder="请输入手机号" />
             </el-form-item>
-            <el-form-item label=" 验证码: " prop="captcha" >
-                <el-input v-model="form.captcha1" placeholder="请输入验证码" style="width: 70%;"/>
+            <el-form-item label=" 验证码: " prop="captcha">
+                <el-input v-model="form.captcha" placeholder="请输入验证码" style="width: 70%;" />
                 <el-button type="primary" style="width: 30%;">
                     获取验证码
                 </el-button>
             </el-form-item>
             <el-form-item label="  密码：" prop="password">
-                <el-input v-model="form.password" type="password" placeholder="请输入密码"/>
+                <el-input v-model="form.password" type="password" placeholder="请输入密码" />
             </el-form-item>
             <el-form-item label="确认密码:" prop="cfpassword">
-                <el-input v-model="form.cfpassword" type="password" placeholder="请再次输入密码"/>
+                <el-input v-model="form.cfpassword" type="password" placeholder="请再次输入密码" />
             </el-form-item>
             <el-form-item label="验证码：" prop="captcha" class="CharacterVerification">
-                <el-input v-model="form.captcha2" type="captcha" autocomplete="off" style="width: 61%;" placeholder="请输入验证码"/>
-                <canvas
-                    @click="refresh"
-                    :width="width"
-                    :height="height"
-                    ref="verifyCanvas"
-                    :style="{cursor:'pointer'}"
-                ></canvas>
+                <el-input v-model="form.captcha" type="captcha" autocomplete="off" style="width: 61%;" />
+                <canvas @click="refresh" :width="width" :height="height" ref="verifyCanvas"
+                    :style="{ cursor: 'pointer' }"></canvas>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="isCaptcha" class="login_btn">
+                <el-button type="primary" @click="handleRegister" class="login_btn">
                     注册
                 </el-button>
                 <el-button @click="returnToLogin" class="login_btn">返回</el-button>
@@ -183,8 +178,7 @@ export default defineComponent({
             mobile: "",
             password: "",
             cfpassword: "",
-            captcha1: "",
-            captcha2: "",
+            captcha: "",
         })
         //两次密码一致
         function validateTwoPassword() {
@@ -216,26 +210,15 @@ export default defineComponent({
                 { validator: validateTwoPassword(), trigger: ['change', 'blur'] },
 
             ],
-            captcha1: [
+            captcha: [
                 { required: true, message: '请输入验证码', trigger: ['change', 'blur'], },
                 { min: 4, max: 4, message: '验证码格式错误', trigger: ['change', 'blur'], },
-            ],
-            captcha2: [
-                { required: true, message: '请输入验证码', trigger: ['change', 'blur'], },
-                { min: 4, max: 4, message: '验证码格式错误', trigger: ['change', 'blur'], },
+
             ]
         });
 
-        function isCaptcha() {
-            if (validate(form.captcha2)) {
-                handleRegister();//调用注册函数
-            } else {
-                alert("验证码错误");
-            }
-        }
         //使用“async”函数进行异步操作，防止页面卡死
         async function handleRegister() {
-            
 
             //已修改
             if (!registerForm.value) {
@@ -279,33 +262,10 @@ export default defineComponent({
             registerForm,
             handleRegister,
             returnToLogin,
-            isCaptcha,
         };
     },
 });
 
 </script>
 
-<style lang ="scss" scoped>
-    .login-box{
-        width: 100%;
-        height: 100%;
-        background:url("../assets/Login.jpg") ;
-        padding:1px;
-        text-align: center;
-        .demo-ruleForm{
-        width: 500px;
-        margin: 200px auto;
-        background-color: aliceblue;
-        padding: 40px;
-        border-radius: 20px;
-    }
-    .login_btn{
-        width: 48%;
-    }
-    h2{
-        margin-bottom: 10px;
-    }
-    }
-    
-</style>
+<style scoped></style>
