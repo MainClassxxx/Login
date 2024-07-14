@@ -1,16 +1,16 @@
 <template>
     <div class="login-box">
-        <el-form ref="ruleFormRef" style="max-width: 600px" :model="ruleForm" status-icon :rules="rules"
+        <el-form ref="ruleFormRef" style="max-width: 600px" :model="form" status-icon :rules="rules"
             label-width="80px" class="demo-ruleForm">
             <h2>登录</h2>
             <el-form-item label="账号：" prop="uname">
-                <el-input v-model="ruleForm.uname" autocomplete="off" />
+                <el-input v-model="form.uname" autocomplete="off" />
             </el-form-item>
             <el-form-item label="密码：" prop="password">
-                <el-input v-model="ruleForm.password" type="password" autocomplete="off" />
+                <el-input v-model="form.password" type="password" autocomplete="off" />
             </el-form-item>
             <el-form-item label="验证码：" prop="captcha" class="CharacterVerification">
-                <el-input v-model="ruleForm.captcha" type="captcha" autocomplete="off" style="width: 61%;"/>
+                <el-input v-model="form.captcha" type="captcha" autocomplete="off" style="width: 61%;"/>
                 <canvas
                     @click="refresh"
                     :width="width"
@@ -20,7 +20,7 @@
                 ></canvas>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="submitForm(ruleFormRef)" class="login_btn">
+                <el-button type="primary" @click="isCaptcha" class="login_btn">
                     登录
                 </el-button>
                 <el-button @click="redirectsForm()" class="login_btn">注册</el-button>
@@ -33,11 +33,8 @@
 import { reactive } from 'vue';
 import { defineComponent,onMounted} from 'vue';
 import { toRefs,ref} from 'vue';
-import {LoginData } from '../type/login';
-import type { FormInstance, FormRules } from 'element-plus'
-import {login} from '../request/api'
+import {login} from '../utils/api';
 import { useRouter } from 'vue-router';
-import { pushScopeId } from 'vue';
 
 export default defineComponent({
 
@@ -57,10 +54,15 @@ export default defineComponent({
         },
     },
     setup (props, { expose }) {
+        const loginForm = ref(null);
         
-        const data=reactive(new LoginData());
-        const rules = {
-                username: [
+        const form = reactive({
+            uname: "",
+            password: "",
+            captcha: "",
+        })
+        const rules = reactive({
+                uname: [
                     { required: true, message: '请输入账号', trigger:['change' ,'blur'],},
                     {pattern: /^[a-zA-Z0-9_-]{3,16}$/, message: '账号格式错误', trigger: ['change' ,'blur']}
                 ],
@@ -73,38 +75,69 @@ export default defineComponent({
                     { min: 4, max: 4, message: '验证码格式错误', trigger:['change' ,'blur'], },
 
                 ]
-        };
+        });
         
         //登录
-        const ruleFormRef = ref<FormInstance>()
-        const router=useRouter();
-        const submitForm = (formEl: FormInstance | undefined) => {
-            if(validate(data.ruleForm.captcha)){
-                if (!formEl) return;
-            //对表单的内容进行验证
-            //valid布尔类型，true验证成功，反之失败
-            formEl.validate((valid) => {
-                if (valid) {
-                    //console.log('submit!');
-                    login(data.ruleForm).then((res)=>{
-                        // console.log(res);
-                        //保存token
-                        localStorage.setItem('token',res.data.token);
-                        //跳转页面
-                        router.push('/home')
+        // const ruleFormRef = ref<FormInstance>()
+         const router=useRouter();
+        // const submitForm = (formEl: FormInstance | undefined) => {
+        //     if(validate(data.ruleForm.captcha)){
+        //         if (!formEl) return;
+        //     //对表单的内容进行验证
+        //     //valid布尔类型，true验证成功，反之失败
+        //     formEl.validate((valid) => {
+        //         if (valid) {
+        //             //console.log('submit!');
+        //             login(data.ruleForm).then((res)=>{
+        //                 // console.log(res);
+        //                 //保存token
+        //                 localStorage.setItem('token',res.data.token);
+        //                 //跳转页面
+        //                 router.push('/home')
                         
-                    })
-                } else {
-                    console.log('error submit!');
-                }
-            });
-            // console.log(formEl)
-            }else{
+        //             })
+        //         } else {
+        //             console.log('error submit!');
+        //         }
+        //     });
+        //     // console.log(formEl)
+        //     }else{
 
-                alert("验证码错误！")
-            }
+        //         alert("验证码错误！")
+        //     }
             
+        // }
+
+        //
+        function isCaptcha() {
+            if (validate(form.captcha)) {
+                handleLogin();//调用注册函数
+            } else {
+                alert("验证码错误");
+            }
         }
+        //使用async函数处理异步操作
+        async function handleLogin() {
+            if (loginForm.value) { // 添加空值检查
+                const isValid = await (loginForm.value as { validate: () => Promise<boolean> }).validate();
+                if (isValid) {
+                    try {
+                        console.log("校验成功");
+                        const res = await login(form);
+                        console.log(res.data);
+                        alert("登录成功！");
+                        router.push('/home');
+                    } catch (error) {
+                        console.log(error);
+                        alert("登录失败！");
+                    }
+                }
+            } else {
+                alert("表单未初始化或为空！");
+            }
+        }
+
+        
         const redirectsForm = () => {
             router.push('/register')
         }
@@ -218,15 +251,17 @@ export default defineComponent({
         expose({ validate });
 
         //解构data使用属性
-        return { ...toRefs(data),
+        return { 
             rules,
-            ruleFormRef,
-            submitForm,
+            form,
+            loginForm,
+            isCaptcha,
             redirectsForm,
             CharacterVerification,
             verifyCanvas,
             refresh,
             validate,
+            handleLogin,
         }
     }
 })
