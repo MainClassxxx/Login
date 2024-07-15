@@ -67,6 +67,7 @@ export default defineComponent({
             "a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z,A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z".split(
                 ","
             );
+            //ref创建响应式数据
         const code = ref("");
         const CharacterVerification = ref<HTMLDivElement | null>(null);
         const verifyCanvas = ref<HTMLCanvasElement | null>(null);
@@ -266,6 +267,13 @@ export default defineComponent({
 
         }
 
+
+        //手机号格式验证
+        function validateMobile(mobile:string):boolean {
+    const mobilePattern = /^[1][3,4,5,7,8][0-9]{9}$/;
+    return mobilePattern.test(mobile);
+}
+
         //倒计时时间
         const totalTime = 60;
         //ref响应式引用,创建倒计时状态
@@ -306,6 +314,10 @@ export default defineComponent({
         const btnText = computed(() => (countingDown.value ? remainingTime.seconds : "获取验证码"))
 
         const btnTime = () => {
+            if(!validateMobile(form.mobile)){
+                alert("请输入正确的手机号");
+                return;
+            }
             startCountingDown()
         }
 
