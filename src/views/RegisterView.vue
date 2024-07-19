@@ -175,7 +175,7 @@ export default defineComponent({
         };
         //表单对象
         //ref创建响应式数据
-        const registerForm = ref(null);
+        const registerForm:any = ref(null);
 
         //表单数据
         const form = reactive({

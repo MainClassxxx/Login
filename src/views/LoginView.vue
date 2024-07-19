@@ -1,6 +1,6 @@
 <template>
     <div class="login-box">
-        <el-form ref="ruleFormRef" style="max-width: 600px" :model="form" status-icon :rules="rules"
+        <el-form ref="loginForm" style="max-width: 600px" :model="form" status-icon :rules="rules"
             label-width="80px" class="demo-ruleForm">
             <h2>登录</h2>
             <el-form-item label="账号：" prop="uname">
@@ -53,8 +53,9 @@ export default defineComponent({
             default: "blend", //图形验证码默认类型blend:数字字母混合类型、number:纯数字、letter:纯字母
         },
     },
+    //组合式api入口 //用于在组件创建之前执行一些逻辑
     setup (props, { expose }) {
-        const loginForm = ref(null);
+        const loginForm:any = ref(null);
         
         const form = reactive({
             uname: "",
@@ -78,7 +79,7 @@ export default defineComponent({
         });
         
         //登录
-        // const ruleFormRef = ref<FormInstance>()
+        //const ruleFormRef = ref<FormInstance>()
          const router=useRouter();
         // const submitForm = (formEl: FormInstance | undefined) => {
         //     if(validate(data.ruleForm.captcha)){
@@ -118,19 +119,17 @@ export default defineComponent({
         }
         //使用async函数处理异步操作
         async function handleLogin() {
-            if (loginForm.value) { // 添加空值检查
-                const isValid = await (loginForm.value as { validate: () => Promise<boolean> }).validate();
-                if (isValid) {
-                    try {
-                        console.log("校验成功");
-                        const res = await login(form);
-                        console.log(res.data);
-                        alert("登录成功！");
-                        router.push('/home');
-                    } catch (error) {
-                        console.log(error);
-                        alert("登录失败！");
-                    }
+            const isValid = await loginForm.value.validate();
+            if (isValid) {
+                try {
+                    console.log("校验成功");
+                    const res = await login(form);
+                    console.log(res.data);
+                    alert("登录成功！");
+                    router.push('/home');
+                } catch (error) {
+                    console.log(error);
+                    alert("登录失败！");
                 }
             } else {
                 alert("表单未初始化或为空！");
@@ -154,6 +153,9 @@ export default defineComponent({
         // 生成验证码
         let ctx;
         onMounted(() => {
+            if(loginForm.value){
+                console.log(loginForm.value);
+            }
             refresh();
         })
         const refresh = () => {
