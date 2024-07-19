@@ -1,6 +1,6 @@
 <template>
     <div class="login-box">
-        <el-form ref="ruleFormRef" style="max-width: 600px" :model="form" status-icon :rules="rules"
+        <el-form ref="registerForm" style="max-width: 600px" :model="form" status-icon :rules="rules"
             label-width="80px" class="demo-ruleForm">
             <h2>注册</h2>
             <el-form-item label="  账号：" prop="uname" >
@@ -174,6 +174,7 @@ export default defineComponent({
             router.push({ name: 'login' });
         };
         //表单对象
+        //ref创建响应式数据
         const registerForm = ref(null);
 
         //表单数据
@@ -187,11 +188,11 @@ export default defineComponent({
         })
         //两次密码一致
         function validateTwoPassword() {
+            //返回一个匿名函数，有三个参数：rule: 规则，value: 输入值，callback: 回调函数-->在验证完成后调用
             return (rule: any, value: any, callback: any) => {
                 if (value !== form.password && form.cfpassword !== "") {
                     callback(new Error("两次输入密码不一致"));
                 } else {
-
                     callback();
                 }
             }
@@ -199,7 +200,9 @@ export default defineComponent({
 
         const rules = reactive({
             uname: [
+                //required:是否为必填项，message:错误提示信息，trigger:触发验证的事件，用户输入改变change，失去焦点blur时触发验证
                 { required: true, message: '请输入账号', trigger: ['change', 'blur'] },
+                //patten:正则表达式，message:错误提示信息，trigger:触发验证的事件，用户输入改变change，失去焦点blur时触发验证
                 { pattern: /^[a-zA-Z0-9_-]{5,16}$/, message: '账号可以由由英文字母开头的长度4-32位的数字、字母、下划线和减号组成', trigger: ['change', 'blur'] }
             ],
             mobile: [
@@ -210,10 +213,10 @@ export default defineComponent({
 
             ],
             cfpassword: [
-                { trigger: 'blur', message: "请再次输入密码" },
+                { required: true,trigger: ['change', 'blur'], message: "请再次输入密码" },
                 { required: true, min: 3, message: "请输入至少三位密码", trigger: ['change', 'blur'] },
+                //validator:自定义验证函数，trigger:触发验证的事件，用户输入改变change，失去焦点blur时触发验证
                 { validator: validateTwoPassword(), trigger: ['change', 'blur'] },
-
             ],
             captcha1: [
                 { required: true, message: '请输入验证码', trigger: ['change', 'blur'], },
@@ -234,24 +237,18 @@ export default defineComponent({
         }
         //使用“async”函数进行异步操作，防止页面卡死
         async function handleRegister() {
-            
-
-            //已修改
-            if (!registerForm.value) {
-                console.error("registerForm.value 未初始化");
-                return;
-            }
-            const isValid = await (registerForm.value as { validate: () => Promise<boolean> }).validate();
-
-
+            const isValid = await registerForm.value.validate();
             if (isValid) {
                 console.log("验证成功");
+                //准备要发送的数据
                 const newData = {
                     uname: form.uname,
                     mobile: form.mobile,
                     password: form.password,
                     cfpassword: form.cfpassword,
                 };
+
+                //尝试发送注册请求
                 try {
                     const res = await register(newData);
                     console.log(res.data);
