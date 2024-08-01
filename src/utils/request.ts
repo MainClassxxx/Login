@@ -7,7 +7,7 @@ import { AxiosRequestConfig,AxiosResponse } from 'axios';
 const service = axios.create({
     //服务接口请求
     // baseURL: process.env.VUE_APP_BASE_API,
-    baseURL:"/",
+    baseURL:"http://localhost:8088/user",
 
     //超时时间
     timeout:1500,
@@ -81,7 +81,7 @@ service.interceptors.response.use((res: any)=>{
 
     //获取错误信息
     const msg = errorCodeType(code)||res.data['msg']||errorCodeType('default');
-    if(code === 200) {
+    if(code === 200||code === '0') {
         return Promise.resolve(res.data);
 
     } else {

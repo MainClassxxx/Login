@@ -3,14 +3,16 @@ import request from "../utils/request";
 
 export function register(data: any) {
     return request({
-        url: 'api/register/',
+        url: '/register',
         method: 'post',
         data: data,
     })
 }
 export function login(data: any) {
+    console.log(JSON.stringify(data));
+    
     return request({
-        url: 'api/login/',
+        url: '/login',
         method: 'post',
         data: data,
     })

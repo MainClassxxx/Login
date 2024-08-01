@@ -35,6 +35,7 @@ import { defineComponent,onMounted} from 'vue';
 import { toRefs,ref} from 'vue';
 import {login} from '../utils/api';
 import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 export default defineComponent({
 
@@ -113,6 +114,19 @@ export default defineComponent({
         function isCaptcha() {
             if (validate(form.captcha)) {
                 handleLogin();//调用注册函数
+                // axios.post('http://localhost:8088/user/login', {
+                //     uname: form.uname,
+                //     password: form.password
+                // })
+                //     .then(response => {
+                //         console.log("登录成功");
+                        
+                //         // 处理响应
+                //     })
+                //     .catch(error => {
+                //         // 处理错误
+                //     });
+   
             } else {
                 alert("验证码错误");
             }
@@ -123,7 +137,7 @@ export default defineComponent({
             if (isValid) {
                 try {
                     console.log("校验成功");
-                    const res = await login(form);
+                    const res = await login({uname: form.uname, password: form.password});
                     console.log(res.data);
                     alert("登录成功！");
                     router.push('/home');

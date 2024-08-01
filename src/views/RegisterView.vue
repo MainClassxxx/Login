@@ -252,7 +252,8 @@ export default defineComponent({
                 try {
                     const res = await register(newData);
                     console.log(res.data);
-                    alert(res.data.msg);
+                    alert('注册成功');
+                    router.push('/login');
 
                 } catch (err) {
                     console.error(err);
